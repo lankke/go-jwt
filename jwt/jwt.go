@@ -1,6 +1,8 @@
 package jwt
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
 )
@@ -25,12 +27,15 @@ func CreateJwtHeader() JWTHeader {
 	}
 }
 
-func CreateJwt(body []byte) string {
+func CreateJwt(secret string, body []byte) string {
 
 	header := CreateJwtHeader()
 
 	bodyBase64 := base64.URLEncoding.EncodeToString(body)
-	signature := base64.URLEncoding.EncodeToString([]byte(`signature`))
+
+	h := hmac.New(sha256.New, []byte(secret))
+	h.Write([]byte(fmt.Sprintf("%s.%s", header.Base64(), bodyBase64)))
+	signature := base64.URLEncoding.EncodeToString(h.Sum(nil))
 
 	return fmt.Sprintf("%s.%s.%s", header.Base64(), bodyBase64, signature)
 }

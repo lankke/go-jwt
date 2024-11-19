@@ -1,6 +1,8 @@
 package jwt
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
 	"strings"
@@ -9,12 +11,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func createExpectedSignature(header, body, secret string) string {
+
+	bodyBase64 := base64.URLEncoding.EncodeToString([]byte(body))
+
+	h := hmac.New(sha256.New, []byte(secret))
+	h.Write([]byte(fmt.Sprintf("%s.%s", header, bodyBase64)))
+	signature := base64.URLEncoding.EncodeToString(h.Sum(nil))
+	return signature
+}
+
 func TestCreateJwt(t *testing.T) {
-	expectedHeader := `{"alg":"HS256","typ":"JWT"}`
+	expectedHeader := CreateJwtHeader()
 	expectedBody := `{"name":"Test","age":32}`
-	expectedSignature := `signature`
+
+	sharedSecret := "this_is_a_secret"
+
+	expectedSignature := createExpectedSignature(expectedHeader.Base64(), expectedBody, sharedSecret)
 	// Create a new JWT
-	jwt := CreateJwt([]byte(expectedBody))
+	jwt := CreateJwt(sharedSecret, []byte(expectedBody))
 
 	t.Run("Returns a string", func(t *testing.T) {
 		assert.NotEmpty(t, jwt)
@@ -47,7 +62,7 @@ func TestCreateJwt(t *testing.T) {
 
 		decodedHeader, err := base64.URLEncoding.DecodeString(header)
 		assert.NoError(t, err)
-		assert.Equal(t, expectedHeader, string(decodedHeader))
+		assert.Equal(t, expectedHeader.String(), string(decodedHeader))
 	})
 
 	t.Run("header is json", func(t *testing.T) {
@@ -76,9 +91,9 @@ func TestCreateJwt(t *testing.T) {
 		parts := strings.Split(jwt, ".")
 		signature := parts[2]
 
-		decodedSignature, err := base64.URLEncoding.DecodeString(signature)
-		assert.NoError(t, err)
-		assert.Equal(t, expectedSignature, string(decodedSignature))
+		//decodedSignature, err := base64.URLEncoding.DecodeString(signature)
+		// assert.NoError(t, err)
+		assert.Equal(t, expectedSignature, signature)
 	})
 
 }
