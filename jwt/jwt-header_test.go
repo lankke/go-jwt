@@ -1,10 +1,19 @@
 package jwt
 
-import "testing"
+import (
+	"testing"
 
-func TestCreateJwtHeaderUnsupportedAlgorithm(t *testing.T) {
-	_, err := CreateJwtHeader("unsupported_alg")
-	if err == nil {
-		t.Errorf("expected error for unsupported algorithm, got nil")
-	}
+	"github.com/stretchr/testify/assert"
+)
+
+func TestCreateJwtHeader(t *testing.T) {
+
+	t.Run("expect error when algorithm unsupported", func(t *testing.T) {
+
+		header, err := CreateJwtHeader("GIBBERISH")
+
+		assert.Error(t, err)
+		assert.Empty(t, header)
+
+	})
 }

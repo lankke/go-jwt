@@ -7,6 +7,10 @@ import (
 	"fmt"
 )
 
+const (
+	AlgHS256 = "HS256"
+)
+
 type JWTHeader struct {
 	Alg string `json:"alg"`
 	Typ string `json:"typ"`
@@ -20,16 +24,21 @@ func (j JWTHeader) Base64() string {
 	return base64.URLEncoding.EncodeToString([]byte(j.String()))
 }
 
-func CreateJwtHeader() JWTHeader {
+func CreateJwtHeader(alg string) (JWTHeader, error) {
+
+	if alg != AlgHS256 {
+		return JWTHeader{}, fmt.Errorf("unsupported algorithm")
+	}
+
 	return JWTHeader{
 		Alg: "HS256",
 		Typ: "JWT",
-	}
+	}, nil
 }
 
 func CreateJwt(secret string, body []byte) string {
 
-	header := CreateJwtHeader()
+	header, _ := CreateJwtHeader("HS256")
 
 	bodyBase64 := base64.URLEncoding.EncodeToString(body)
 

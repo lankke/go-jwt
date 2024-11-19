@@ -22,7 +22,7 @@ func createExpectedSignature(header, body, secret string) string {
 }
 
 func TestCreateJwt(t *testing.T) {
-	expectedHeader := CreateJwtHeader()
+	expectedHeader, _ := CreateJwtHeader("HS256")
 	expectedBody := `{"name":"Test","age":32}`
 
 	sharedSecret := "this_is_a_secret"
