@@ -16,4 +16,22 @@ func TestCreateJwtHeader(t *testing.T) {
 		assert.Empty(t, header)
 
 	})
+
+	t.Run("supports HS256 algorithm", func(t *testing.T) {
+
+		header, err := CreateJwtHeader("HS256")
+
+		assert.NoError(t, err)
+		assert.NotEmpty(t, header)
+
+	})
+
+	t.Run("supports HS384 algorithm", func(t *testing.T) {
+
+		header, err := CreateJwtHeader("HS384")
+
+		assert.NoError(t, err)
+		assert.NotEmpty(t, header)
+
+	})
 }
