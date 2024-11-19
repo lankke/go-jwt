@@ -91,8 +91,6 @@ func TestCreateJwt(t *testing.T) {
 		parts := strings.Split(jwt, ".")
 		signature := parts[2]
 
-		//decodedSignature, err := base64.URLEncoding.DecodeString(signature)
-		// assert.NoError(t, err)
 		assert.Equal(t, expectedSignature, signature)
 	})
 
